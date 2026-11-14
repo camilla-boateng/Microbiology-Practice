@@ -539,24 +539,23 @@
     }
 
     function updateScore() {
-        const totalQuestions = activeQuestions.length;
-        if(totalQuestions === 0) {
-            document.getElementById('score-counter').textContent = `Grade: 0%`;
-            return;
-        }
+        let submittedCount = 0;
+        let totalScore = 0;
 
-        // Calculate points lost just for the active set
-        let activePointsLost = 0;
-        activeQuestions.forEach(q => {
-            const state = userState.get(q.qid);
-            if(state && state.submitted) {
-                activePointsLost += (1 - state.score);
+        userState.forEach(state => {
+            if (state.submitted) {
+                submittedCount++;
+                totalScore += state.score;
             }
         });
 
-        let currentGrade = Math.max(0, Math.round(((totalQuestions - activePointsLost) / totalQuestions) * 100));
+        const grade = submittedCount > 0
+            ? Math.round((totalScore / submittedCount) * 100)
+            : 0;
+
         const scoreElem = document.getElementById('score-counter');
-        scoreElem.textContent = `Grade: ${currentGrade}%`;
+        scoreElem.textContent = `Grade: ${grade}%`;
+        scoreElem.title = `Answered ${submittedCount} / ${questionBank.length}`;
     }
 
     function renderQuestions() {
