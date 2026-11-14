@@ -1,0 +1,2548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MICR1500 Clinical Microbiology Practice Exam</title>
+  <style>
+:root {
+            --primary: #0f172a;
+            --accent: #2563eb;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --correct-border: #16a34a;
+            --correct-bg: #f0fdf4;
+            --correct-text: #15803d;
+            --wrong-border: #dc2626;
+            --wrong-bg: #fef2f2;
+            --wrong-text: #b91c1c;
+            --partial-border: #d97706;
+            --partial-bg: #fffbeb;
+            --partial-text: #92400e;
+            --border-color: #e2e8f0;
+            --selected-border: #93c5fd;
+            --selected-bg: #eff6ff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            line-height: 1.5;
+            padding-bottom: 60px;
+        }
+
+        /* Sticky Header */
+        header {
+            position: -webkit-sticky;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--primary);
+            color: #ffffff;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+            padding: 12px 16px;
+        }
+
+        .header-content {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .header-title {
+            min-width: 0;
+        }
+
+        .header-title h1 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .header-title p {
+            font-size: 0.75rem;
+            color: #94a3b8;
+        }
+
+        .score-badge {
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        /* Navigation / Filter Bar */
+        .nav-bar {
+            max-width: 800px;
+            margin: 16px auto 0;
+            padding: 0 16px;
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .nav-bar::-webkit-scrollbar { display: none; }
+
+        .filter-btn,
+        .reset-btn {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .filter-btn:hover,
+        .reset-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .filter-btn.active {
+            background: var(--accent);
+            color: #ffffff;
+            border-color: var(--accent);
+        }
+
+        /* Main Container */
+        main {
+            max-width: 800px;
+            margin: 16px auto;
+            padding: 0 16px;
+        }
+
+        /* Question Cards */
+        .q-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        }
+
+        .q-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .q-num {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .q-cat {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            background: #f1f5f9;
+            padding: 2px 8px;
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+
+        .q-text {
+            font-size: 0.98rem;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 16px;
+            line-height: 1.45;
+        }
+
+        /* Options */
+        .opt-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .opt-btn {
+            display: flex;
+            align-items: flex-start;
+            width: 100%;
+            padding: 12px 14px;
+            border: 1.5px solid var(--border-color);
+            border-radius: 10px;
+            background: #ffffff;
+            color: var(--text-main);
+            font-size: 0.92rem;
+            font-weight: 500;
+            text-align: left;
+            cursor: pointer;
+            transition: border-color 0.15s ease, background-color 0.15s ease, opacity 0.15s ease;
+        }
+
+        .opt-btn:hover:not(:disabled) {
+            border-color: #cbd5e1;
+            background: #f8fafc;
+        }
+
+        .opt-btn:active:not(:disabled) { background-color: #f1f5f9; }
+
+        .opt-prefix {
+            font-weight: 700;
+            margin-right: 8px;
+            color: var(--text-muted);
+            flex-shrink: 0;
+        }
+
+        .opt-btn.selected {
+            border-color: var(--selected-border);
+            background: var(--selected-bg);
+            color: #1d4ed8;
+        }
+
+        .q-card.answered .opt-btn {
+            cursor: default;
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        .q-card.answered .opt-btn.user-correct,
+        .q-card.answered .opt-btn.reveal-correct {
+            background-color: var(--correct-bg) !important;
+            border-color: var(--correct-border) !important;
+            color: var(--correct-text) !important;
+            opacity: 1 !important;
+            font-weight: 600;
+        }
+
+        .q-card.answered .opt-btn.user-wrong {
+            background-color: var(--wrong-bg) !important;
+            border-color: var(--wrong-border) !important;
+            color: var(--wrong-text) !important;
+            opacity: 1 !important;
+            font-weight: 600;
+        }
+
+        /* PATH2200 Submit */
+        .submit-q-btn {
+            margin-top: 14px;
+            padding: 9px 14px;
+            border: 1px solid var(--accent);
+            border-radius: 8px;
+            background: var(--accent);
+            color: #ffffff;
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.15s ease, transform 0.1s ease;
+        }
+
+        .submit-q-btn:hover:not(:disabled) { opacity: 0.92; }
+        .submit-q-btn:active:not(:disabled) { transform: scale(0.98); }
+        .submit-q-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+        .feedback-box {
+            display: none;
+            margin-top: 14px;
+            padding: 12px 14px;
+            border-radius: 8px;
+            font-size: 0.88rem;
+            line-height: 1.45;
+        }
+
+        .feedback-box.correct {
+            background-color: var(--correct-bg);
+            border-left: 4px solid var(--correct-border);
+            color: var(--correct-text);
+        }
+
+        .feedback-box.incorrect {
+            background-color: var(--wrong-bg);
+            border-left: 4px solid var(--wrong-border);
+            color: var(--wrong-text);
+        }
+
+        .feedback-box.partial {
+            background-color: var(--partial-bg);
+            border-left: 4px solid var(--partial-border);
+            color: var(--partial-text);
+        }
+
+        .feedback-title { font-weight: 700; margin-bottom: 4px; }
+        .explanation { margin-top: 4px; color: inherit; }
+
+        @media (max-width: 640px) {
+            header { padding: 10px 12px; }
+            .header-title h1 { font-size: 1rem; }
+            .header-title p { font-size: 0.7rem; }
+            .score-badge { padding: 5px 10px; font-size: 0.8rem; }
+            .nav-bar { padding: 0 12px; margin-top: 12px; }
+            main { margin-top: 12px; padding: 0 12px; }
+            .q-card { padding: 16px; }
+            .q-text { font-size: 0.95rem; }
+            .opt-btn { font-size: 0.9rem; padding: 11px 12px; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="header-content">
+            <div class="header-title">
+                <h1>MICR1500 Clinical Microbiology Practice Exam</h1>
+                <p id="header-subtitle">100 Questions • 4 Lecture Sections + Malaria Reading</p>
+            </div>
+            <div class="score-badge" id="score-counter">
+                Grade: 0%
+            </div>
+        </div>
+    </header>
+
+    <div class="nav-bar" id="navTabs">
+        <button class="filter-btn active" data-lec="all" type="button">All (100)</button>
+        <button class="filter-btn" data-lec="1" type="button">Lec 1: Intro &amp; History (20)</button>
+        <button class="filter-btn" data-lec="2" type="button">Lec 2: Bacteria &amp; Staining (20)</button>
+        <button class="filter-btn" data-lec="3" type="button">Lec 3: Viruses &amp; Prions (20)</button>
+        <button class="filter-btn" data-lec="4" type="button">Lec 4: Fungi &amp; Protozoa (20)</button>
+        <button class="filter-btn" data-lec="5" type="button">Malaria Reading (20)</button>
+        <button class="reset-btn" id="resetBtn" type="button">Reset</button>
+    </div>
+
+    <main id="questionsContainer"></main>
+
+    <script>
+    // QUESTION BANK DATA
+    // ---------------------------------------------------------
+    const questionBank = [
+
+      // ==========================================
+      // LECTURE 1: Introduction to Microbiology (20 Qs: 16 MCQ, 4 SATA)
+      // ==========================================
+      {
+        lec: 1,
+        type: "sata",
+        text: "Which of the following entities are classified as acellular microbes lacking cellular structures? (SELECT ALL THAT APPLY)",
+        options: [
+          { text: "Viruses", correct: true },
+          { text: "Prions", correct: true },
+          { text: "Bacteria", correct: false },
+          { text: "Fungi", correct: false },
+          { text: "Protozoa", correct: false }
+        ],
+        explanation: "Viruses and prions are acellular microbes characterized by the absence of a cell structure. Bacteria, fungi, and protozoa are cellular."
+      },
+      {
+        lec: 1,
+        type: "sata",
+        text: "Which of the following statements accurately characterize nonpathogens and opportunists? (SELECT ALL THAT APPLY)",
+        options: [
+          { text: "A nonpathogen does not normally cause disease.", correct: true },
+          { text: "Staphylococcus epidermidis is an example of a nonpathogen.", correct: true },
+          { text: "Opportunists cause infection when they are in the wrong place, at the wrong time, or in the wrong amount.", correct: true },
+          { text: "Pathogens never cause disease unless immunity is completely absent.", correct: false },
+          { text: "Opportunists are strictly acellular entities.", correct: false }
+        ],
+        explanation: "Nonpathogens like S. epidermidis do not normally cause disease. When placed in unusual body locations or amounts, they act as opportunists."
+      },
+      {
+        lec: 1,
+        type: "sata",
+        text: "Which historical figures are correctly matched with their specific contribution to microbiology? (SELECT ALL THAT APPLY)",
+        options: [
+          { text: "Antonie van Leeuwenhoek – First person to draw a microbe / Father of Microbiology", correct: true },
+          { text: "Ignaz Semmelweis – Advocated for physicians washing hands using chlorine", correct: true },
+          { text: "Robert Koch – Proved the germ theory of disease using culture techniques", correct: true },
+          { text: "Angelina Fanny Hesse – Suggested agar as a microbial growth medium", correct: true },
+          { text: "Edward Jenner – Discovered penicillin mold antibiotics.", correct: false }
+        ],
+        explanation: "Leeuwenhoek (microbes), Semmelweis (chlorine handwashing), Koch (germ theory), and Hesse (agar) are correctly paired. Jenner performed the first smallpox vaccination."
+      },
+      {
+        lec: 1,
+        type: "sata",
+        text: "Which statements regarding global disease burden, pandemics, and eradication are correct? (SELECT ALL THAT APPLY)",
+        options: [
+          { text: "Smallpox is the only infectious human disease officially eradicated globally.", correct: true },
+          { text: "Acute lower respiratory infections rank as the number one infectious killer worldwide.", correct: true },
+          { text: "Wild-type polio virus is primarily transmitted via the fecal-oral route.", correct: true },
+          { text: "Measles is the single most infectious disease in the world.", correct: true },
+          { text: "SARS-CoV-2 is the first pandemic recorded in human history.", correct: false }
+        ],
+        explanation: "Smallpox is eradicated; lower respiratory infections are the top killer; wild polio spreads via fecal-oral transmission; measles is the most infectious. Numerous historical pandemics occurred prior to SARS-CoV-2."
+      },
+      {
+        lec: 1,
+        type: "mcq",
+        text: "Who is widely recognized as the 'Father of Microbiology' and was the first person to draw a microbe?",
+        options: [
+          { text: "Antonie van Leeuwenhoek", correct: true },
+          { text: "Louis Pasteur", correct: false },
+          { text: "Robert Koch", correct: false },
+          { text: "Joseph Lister", correct: false }
+        ],
+        explanation: "Antonie van Leeuwenhoek is the Father of Microbiology and first drew microbes in the 1670s."
+      },
+      {
+        lec: 1,
+        type: "mcq",
+        text: "Which historical figure conducted the first epidemiological study by tracing a cholera outbreak to a specific water pump?",
+        options: [
+          { text: "John Snow", correct: true },
+          { text: "Ignaz Semmelweis", correct: false },
+          { text: "Edward Jenner", correct: false },
+          { text: "Dmitri Ivanovsky", correct: false }
+        ],
+        explanation: "John Snow performed the first epidemiological study of infectious disease regarding cholera."
+      },
+      {
+        lec: 1,
+        type: "mcq",
+        text: "Joseph Lister is best remembered in microbiology history for which contribution?",
+        options: [
+          { text: "Introducing antiseptic surgery using carbolic acid (phenol)", correct: true },
+          { text: "Discovering penicillin in mold cultures", correct: false },
+          { text: "Developing the smallpox vaccine", correct: false },
+          { text: "Proving the germ theory of disease", correct: false }
+        ],
+        explanation: "Joseph Lister is the Father of antiseptic surgery, utilizing carbolic acid to treat wounds and cleanse after surgery."
+      },
+      {
+        lec: 1,
+        type: "mcq",
+        text: "What was the primary paradigm shift that characterized the 'Golden Age of Microbiology' (1857-1917)?",
+        options: [
+          { text: "Linking specific microbes to specific diseases (Germ Theory)", correct: true },
+          { text: "The invention of the scanning electron microscope", correct: false },
+          { text: "The complete eradication of polio globally", correct: false },
+          { text: "The discovery of synthetic antiviral drugs", correct: false }
+        ],
+        explanation: "The Golden Age was defined by discovering disease causes and proving the germ theory."
+      },
+      {
+        lec: 1,
+        type: "mcq",
+        text: "Why must healthcare workers use physical hand washing with soap and water rather than alcohol-based hand sanitizer when caring for a patient with Clostridium difficile?",
+        options: [
+          { text: "C. difficile is spore-forming; hand sanitizer does not kill spores.", correct: true },
+          { text: "C. difficile is an acellular virus unaffected by alcohol.", correct: false },
+          { text: "Alcohol chemically neutralizes antibiotics in the patient's room.", correct: false },
+          { text: "Hand sanitizer increases bacterial exotoxin production.", correct: false }
+        ],
+        explanation: "C. difficile is spore-forming; alcohol sanitizer does not kill spores, necessitating physical hand washing."
+      },
+      {
+        lec: 1,
+        type: "mcq",
+        text: "Approximately how many deaths are caused annually by diarrheal diseases worldwide, making them the 3rd leading infectious killer?",
+        options: [
+          { text: "1.5 million deaths", correct: true },
+          { text: "15,000 deaths", correct: false },
+          { text: "150 million deaths", correct: false },
+          { text: "15 billion deaths", correct: false }
+        ],
+        explanation: "Diarrheal diseases kill approximately 1.5 million people annually."
+      },
+      {
+        lec: 1,
+        type: "mcq",
+        text: "How do infectious diseases rank as a cause of death globally compared to in Canada?",
+        options: [
+          { text: "1st globally, 3rd in Canada", correct: true },
+          { text: "3rd globally, 1st in Canada", correct: false },
+          { text: "1st globally, 1st in Canada", correct: false },
+          { text: "3rd globally, 3rd in Canada", correct: false }
+        ],
+        explanation: "Infectious diseases are the 1st cause of death worldwide but rank 3rd in Canada."
+      },
+      {
+        lec: 1,
+        type: "mcq",
+        text: "What is the term for using bacteria or microbes to clean up environmental disasters such as oil spills?",
+        options: [
+          { text: "Bioremediation", correct: true },
+          { text: "Pasteurization", correct: false },
+          { text: "Fermentation", correct: false },
+          { text: "Sterilization", correct: false }
+        ],
+        explanation: "Bioremediation involves treating the environment with bacteria to clean up contamination."
+      },
+      {
+        lec: 1,
+        type: "mcq",
+        text: "Thinking Application: A public health official is asked why Canada continues mandatory polio vaccination when active domestic wild-type cases are zero. What is the precise epidemiological rationale?",
+        options: [
+          { text: "International travel and globalization can easily reintroduce the virus from endemic regions.", correct: true },
+          { text: "The vaccine provides essential cross-immunity against seasonal influenza strains.", correct: false },
+          { text: "Canadian soil naturally harbors dormant wild-type polio spores.", correct: false },
+          { text: "Vaccination prevents normal gut flora from mutating into poliovirus.", correct: false }
+        ],
+        explanation: "Global travel and globalization risk reintroducing polio from regions where it remains endemic."
+      },
+      {
+        lec: 1,
+        type: "mcq",
+        text: "Thinking Application: If a laboratory culture yields a microbe that is completely unaffected by penicillin and lacks any internal metabolic enzymes or ribosomes, how should it be classified?",
+        options: [
+          { text: "As an acellular infectious particle (virus or prion)", correct: true },
+          { text: "As a single-celled eukaryotic protozoan", correct: false },
+          { text: "As a multicellular helminthic worm", correct: false },
+          { text: "As a multi-celled mold fungus", correct: false }
+        ],
+        explanation: "Lack of cells, ribosomes, and metabolic machinery combined with antibiotic resistance defines acellular entities like viruses and prions."
+      },
+      {
+        lec: 1,
+        type: "mcq",
+        text: "Thinking Application: In a hospital outbreak investigation, an immunocompetent patient develops a severe systemic infection from Staphylococcus epidermidis, a bacterium normally residing harmlessly on the skin. How is this pathogen classified?",
+        options: [
+          { text: "As an opportunist", correct: true },
+          { text: "As an obligate acellular parasite", correct: false },
+          { text: "As an obligate extracellular prion", correct: false },
+          { text: "As a primary multi-cellular pathogen", correct: false }
+        ],
+        explanation: "S. epidermidis is a nonpathogen that acts as an opportunist when introduced into unusual locations or settings."
+      },
+      {
+        lec: 1,
+        type: "mcq",
+        text: "Thinking Application: Why did Robert Koch's postulates represent a major breakthrough over Louis Pasteur's earlier work regarding the germ theory?",
+        options: [
+          { text: "Koch scientifically proved the germ theory by isolating and growing specific microbes to reproduce disease.", correct: true },
+          { text: "Pasteur only studied acellular prions, whereas Koch studied eukaryotic fungi.", correct: false },
+          { text: "Koch invented the transmission electron microscope to visualize virus capsids.", correct: false },
+          { text: "Pasteur rejected the idea that microbes could cause human illness.", correct: false }
+        ],
+        explanation: "While Pasteur proposed the germ theory, Koch proved it by isolating causative agents and satisfying his postulates."
+      },
+      {
+        lec: 1,
+        type: "mcq",
+        text: "Thinking Application: Measles possesses an almost 100% effective vaccine, yet global case numbers have risen significantly in recent years. What is the primary driving factor?",
+        options: [
+          { text: "Vaccine hesitancy and reduced immunization rates", correct: true },
+          { text: "Natural mutation of measles into an acellular prion", correct: false },
+          { text: "Widespread bacterial resistance to agar media", correct: false },
+          { text: "Failure of pasteurization in milk supply chains", correct: false }
+        ],
+        explanation: "Vaccine hesitancy has led to declining uptake, fueling resurgences of highly infectious measles."
+      },
+      {
+        lec: 1,
+        type: "mcq",
+        text: "Thinking Application: An infectious disease epidemiologist notes that an outbreak involves an agent passing through human feces and being subsequently consumed. Which disease matches this transmission cycle?",
+        options: [
+          { text: "Wild-type Polio", correct: true },
+          { text: "Measles", correct: false },
+          { text: "Acute lower respiratory pneumonia", correct: false },
+          { text: "Smallpox", correct: false }
+        ],
+        explanation: "Wild-type polio transmission occurs when the virus passes through feces and is then consumed."
+      },
+      {
+        lec: 1,
+        type: "mcq",
+        text: "Thinking Application: Who was Angelina Fanny Hesse and what pivotal contribution did she make to microbiology laboratories?",
+        options: [
+          { text: "An unpaid lab assistant who first suggested agar as a solid growth medium", correct: true },
+          { text: "The epidemiologist who traced cholera to a London water pump", correct: false },
+          { text: "The physician who mandated chlorine handwashing in obstetrics", correct: false },
+          { text: "The researcher who discovered tobacco mosaic virus", correct: false }
+        ],
+        explanation: "Angelina Fanny Hesse suggested agar as a growth medium for bacterial cultures."
+      },
+      {
+        lec: 1,
+        type: "mcq",
+        text: "Thinking Application: Which of the following best describes the global status of smallpox as an infectious disease?",
+        options: [
+          { text: "It is completely and officially eradicated worldwide.", correct: true },
+          { text: "It remains the number one infectious killer globally.", correct: false },
+          { text: "It is endemic across Southeast Asia and Africa.", correct: false },
+          { text: "It is currently undergoing re-emergence due to vaccine hesitancy.", correct: false }
+        ],
+        explanation: "Smallpox is the only infectious human disease completely eradicated globally."
+      },
+
+      // ==========================================
+      // LECTURE 2: General & Bacterial Character (20 Qs: 16 MCQ, 4 SATA)
+      // ==========================================
+      {
+        lec: 2,
+        type: "sata",
+        text: "Which core cellular components are shared by BOTH prokaryotic and eukaryotic cells? (SELECT ALL THAT APPLY)",
+        options: [
+          { text: "Cytoplasm", correct: true },
+          { text: "Ribosomes", correct: true },
+          { text: "Genetic material (DNA)", correct: true },
+          { text: "Plasma (cell) membrane", correct: true },
+          { text: "True membrane-bound nucleus", correct: false }
+        ],
+        explanation: "Both prokaryotes and eukaryotes share cytoplasm, ribosomes, DNA, and plasma membranes. Only eukaryotes possess a true nucleus."
+      },
+      {
+        lec: 2,
+        type: "sata",
+        text: "Which structural and chemical features distinguish Gram-positive bacterial cell walls from Gram-negative walls? (SELECT ALL THAT APPLY)",
+        options: [
+          { text: "Gram-positive walls possess a thick peptidoglycan layer.", correct: true },
+          { text: "Gram-negative walls possess an outer protective membrane containing LPS endotoxins.", correct: true },
+          { text: "Gram-positive bacteria are generally highly susceptible to penicillin.", correct: true },
+          { text: "Gram-negative bacteria lose crystal violet during decolorization and stain pink/red.", correct: true },
+          { text: "Gram-negative bacteria have a thick peptidoglycan layer without an outer membrane.", correct: false }
+        ],
+        explanation: "Gram-positive bacteria have thick peptidoglycan and are sensitive to penicillin. Gram-negative bacteria have a thin peptidoglycan layer, an outer membrane with LPS, and stain pink/red."
+      },
+      {
+        lec: 2,
+        type: "sata",
+        text: "What are the primary functions of specialized bacterial surface structures and appendages? (SELECT ALL THAT APPLY)",
+        options: [
+          { text: "Glycocalyx (capsules/slime layers) protects against white blood cell phagocytosis.", correct: true },
+          { text: "Fimbriae help bacteria adhere tightly to host tissues and surfaces.", correct: true },
+          { text: "Sex pili form intercellular bridges for horizontal gene transfer (conjugation).", correct: true },
+          { text: "Endospores provide extreme survival resistance against heat and starvation.", correct: true },
+          { text: "Flagella serve as primary reproductive structures during binary fission.", correct: false }
+        ],
+        explanation: "Glycocalyx protects against phagocytosis, fimbriae aid adhesion, sex pili enable conjugation, and endospores ensure survival. Flagella are for motility."
+      },
+      {
+        lec: 2,
+        type: "sata",
+        text: "Which statements correctly describe bacterial growth dynamics and cultivation media? (SELECT ALL THAT APPLY)",
+        options: [
+          { text: "During the log (exponential) phase, bacteria undergo rapid doubling and clinical symptoms peak.", correct: true },
+          { text: "Selective media inhibit unwanted microbes while encouraging specific targets.", correct: true },
+          { text: "Differential media allow multiple species to grow while visually distinguishing them.", correct: true },
+          { text: "Binary fission is the asexual reproduction process where one cell splits into two clones.", correct: true },
+          { text: "Endospores are reproductive structures designed to multiply cell numbers rapidly.", correct: false }
+        ],
+        explanation: "Log phase features rapid doubling and peak symptoms; selective and differential media serve distinct identification purposes; binary fission is asexual division. Endospores are for survival, not reproduction."
+      },
+      {
+        lec: 2,
+        type: "mcq",
+        text: "What are the correct formatting rules for writing binomial nomenclature species names?",
+        options: [
+          { text: "Genus capitalized, species lowercase, both italicized (or underlined)", correct: true },
+          { text: "Both words lowercase and enclosed in quotation marks", correct: false },
+          { text: "Species capitalized first, followed by lowercase genus name", correct: false },
+          { text: "Both words fully capitalized in bold text without italics", correct: false }
+        ],
+        explanation: "Binomial nomenclature requires a capitalized Genus, lowercase species, and italics/underlining."
+      },
+      {
+        lec: 2,
+        type: "mcq",
+        text: "Which microscopy tool is specifically required to visualize ultra-microscopic acellular viruses?",
+        options: [
+          { text: "Transmission Electron Microscope (TEM)", correct: true },
+          { text: "Compound light microscope", correct: false },
+          { text: "Simple bright-field dissecting microscope", correct: false },
+          { text: "Phase-contrast light microscope", correct: false }
+        ],
+        explanation: "Viruses require electron microscopy (TEM) for visualization due to their nanometer scale."
+      },
+      {
+        lec: 2,
+        type: "mcq",
+        text: "What is the primary clinical purpose of heat-fixing a bacterial smear prior to staining?",
+        options: [
+          { text: "To kill the bacteria and firmly glue them to the glass slide", correct: true },
+          { text: "To dissolve the thick peptidoglycan cell wall", correct: false },
+          { text: "To convert vegetative bacterial cells into hardy endospores", correct: false },
+          { text: "To transform Gram-negative bacteria into Gram-positive cells", correct: false }
+        ],
+        explanation: "Heat-fixing kills microorganisms and secures them to the slide so they wash away."
+      },
+      {
+        lec: 2,
+        type: "mcq",
+        text: "What colour do Gram-positive bacteria appear when observed under a light microscope after a completed Gram stain?",
+        options: [
+          { text: "Purple / Blue", correct: true },
+          { text: "Pink / Red", correct: false },
+          { text: "Bright green", correct: false },
+          { text: "Colourless", correct: false }
+        ],
+        explanation: "Gram-positive bacteria retain crystal violet and appear purple/blue."
+      },
+      {
+        lec: 2,
+        type: "mcq",
+        text: "Which specialized staining technique uses heat to drive a red dye into waxy cell walls (such as Mycobacterium tuberculosis) that resist acid/alcohol decolorization?",
+        options: [
+          { text: "Acid-Fast Stain", correct: true },
+          { text: "Simple Crystal Violet Stain", correct: false },
+          { text: "Gram Differential Stain", correct: false },
+          { text: "Negative Capsule Stain", correct: false }
+        ],
+        explanation: "The acid-fast stain identifies waxy mycobacteria using heat-driven red dye and acid/alcohol wash."
+      },
+      {
+        lec: 2,
+        type: "mcq",
+        text: "What term describes spherical bacteria arranged in grape-like clusters?",
+        options: [
+          { text: "Staphylococci", correct: true },
+          { text: "Streptococci", correct: false },
+          { text: "Diplococci", correct: false },
+          { text: "Bacilli", correct: false }
+        ],
+        explanation: "'Staphylo-' denotes clusters, and 'cocci' denotes spherical cells."
+      },
+      {
+        lec: 2,
+        type: "mcq",
+        text: "Why are Gram-negative bacteria particularly dangerous when their outer membranes rupture or lyse in the bloodstream?",
+        options: [
+          { text: "They release Lipopolysaccharide (LPS) endotoxins that trigger septic shock.", correct: true },
+          { text: "They instantly convert into indestructible anthrax endospores.", correct: false },
+          { text: "They release massive quantities of carbolic acid.", correct: false },
+          { text: "They degrade all human red blood cells via hemolysis.", correct: false }
+        ],
+        explanation: "Gram-negative outer membranes contain LPS acting as endotoxins capable of inducing severe shock."
+      },
+      {
+        lec: 2,
+        type: "mcq",
+        text: "What is the primary function of bacterial endospores formed by species like Bacillus anthracis and Clostridium difficile?",
+        options: [
+          { text: "Survival against extreme environmental stress and starvation", correct: true },
+          { text: "Asexual reproduction to multiply colony numbers", correct: false },
+          { text: "Locomotion toward nutrient gradients via chemotaxis", correct: false },
+          { text: "Exchanging antibiotic resistance plasmids during conjugation", correct: false }
+        ],
+        explanation: "Endospores are dormant, highly resistant survival structures formed during starvation, not for reproduction."
+      },
+      {
+        lec: 2,
+        type: "mcq",
+        text: "Thinking Application: A clinical microbiologist tests a bacterial isolate and finds it is highly resistant to penicillin due to its protective outer membrane barrier, but stains pink/red in a Gram stain. How is its cell wall structured?",
+        options: [
+          { text: "Thin peptidoglycan layer covered by an outer membrane containing LPS", correct: true },
+          { text: "Extremely thick peptidoglycan mesh interwoven with teichoic acid", correct: false },
+          { text: "Waxy lipid mycolic acid layer requiring acid-fast heating", correct: false },
+          { text: "Complete absence of any cell wall or plasma membrane", correct: false }
+        ],
+        explanation: "Gram-negative bacteria have thin peptidoglycan, an outer membrane shielding them from penicillin, and stain pink/red."
+      },
+      {
+        lec: 2,
+        type: "mcq",
+        text: "Thinking Application: During which phase of the bacterial growth curve do clinical signs and symptoms of an infectious disease typically reach their peak?",
+        options: [
+          { text: "Log (exponential) phase", correct: true },
+          { text: "Lag phase", correct: false },
+          { text: "Stationary phase", correct: false },
+          { text: "Death phase", correct: false }
+        ],
+        explanation: "Rapid exponential doubling during the log phase corresponds to peak clinical symptoms."
+      },
+      {
+        lec: 2,
+        type: "mcq",
+        text: "Thinking Application: Why do eukaryotic cells possess membrane-bound internal organelles while prokaryotic bacterial cells do not?",
+        options: [
+          { text: "Prokaryotes are significantly smaller (~1 to 5 micrometers) and lack true compartmentalization.", correct: true },
+          { text: "Eukaryotes are acellular entities that require internal viral capsids.", correct: false },
+          { text: "Prokaryotes rely entirely on eukaryotic mitochondria for ATP production.", correct: false },
+          { text: "Eukaryotic cells lack any genetic material or ribosomes.", correct: false }
+        ],
+        explanation: "Prokaryotes are much smaller and lack membrane-bound organelles found in larger eukaryotic cells."
+      },
+      {
+        lec: 2,
+        type: "mcq",
+        text: "Thinking Application: What is the purpose of using selective media, such as high salt agar?",
+        options: [
+          { text: "To inhibit unwanted background microbes while encouraging the growth of specific targets", correct: true },
+          { text: "To stain all bacterial cell walls purple for simple light microscopy", correct: false },
+          { text: "To dissolve endospores and trigger rapid binary fission", correct: false },
+          { text: "To convert RNA viral genomes into double-stranded DNA", correct: false }
+        ],
+        explanation: "Selective media suppress unwanted species while selecting for specific halotolerant or target bacteria."
+      },
+      {
+        lec: 2,
+        type: "mcq",
+        text: "Thinking Application: A patient has a suspected case of pulmonary tuberculosis. Which staining method must the laboratory technician select to confirm Mycobacterium tuberculosis?",
+        options: [
+          { text: "Acid-Fast Stain", correct: true },
+          { text: "Simple Crystal Violet Stain", correct: false },
+          { text: "Standard Gram Stain", correct: false },
+          { text: "Negative Spore Stain", correct: false }
+        ],
+        explanation: "M. tuberculosis possesses waxy mycolic acid cell walls requiring the acid-fast stain."
+      },
+      {
+        lec: 2,
+        type: "mcq",
+        text: "Thinking Application: What role do sex pili play in bacterial populations regarding antibiotic resistance?",
+        options: [
+          { text: "They form bridges during conjugation to transfer resistance plasmids between cells.", correct: true },
+          { text: "They secrete carbolic acid to sterilize surgical wound beds.", correct: false },
+          { text: "They act as flagella to swim away from phagocytic white blood cells.", correct: false },
+          { text: "They synthesize peptidoglycan cross-bridges in Gram-positive cell walls.", correct: false }
+        ],
+        explanation: "Sex pili facilitate conjugation, allowing horizontal transfer of antibiotic-resistance genes."
+      },
+      {
+        lec: 2,
+        type: "mcq",
+        text: "Thinking Application: What distinguishes Archaea from Bacteria, despite both being prokaryotes?",
+        options: [
+          { text: "Archaea are prokaryotes that cannot infect humans.", correct: true },
+          { text: "Archaea possess membrane-bound nuclei and eukaryotic organelles.", correct: false },
+          { text: "Archaea are acellular particles structurally identical to prions.", correct: false },
+          { text: "Archaea reproduce exclusively through animal virus budding.", correct: false }
+        ],
+        explanation: "While archaea are prokaryotes, they are distinct from bacteria and do not cause human infections."
+      },
+      {
+        lec: 2,
+        type: "mcq",
+        text: "Thinking Application: What is the primary function of bacterial fimbriae?",
+        options: [
+          { text: "Adhering tightly to host tissues and surfaces", correct: true },
+          { text: "Motility through liquid environments via chemotaxis", correct: false },
+          { text: "Storing reserve carbohydrates during the stationary phase", correct: false },
+          { text: "Producing LPS endotoxins in the outer membrane", correct: false }
+        ],
+        explanation: "Fimbriae are short protein strands that help bacteria anchor to host tissues."
+      },
+
+      // ==========================================
+      // LECTURE 3: Viruses & Prions (20 questions)
+      // ==========================================
+      {
+        lec: 3,
+        type: "sata",
+        text: "Which structural components are mandatory and found in ALL viruses without exception? (SELECT ALL THAT APPLY)",
+        options: [
+          { text: "Capsid (protein coat)", correct: true },
+          { text: "Genome (genetic material: DNA or RNA)", correct: true },
+          { text: "Outer lipid envelope stolen from host", correct: false },
+          { text: "Surface glycoprotein spikes", correct: false },
+          { text: "Ribosomes and ATP synthesis machinery", correct: false }
+        ],
+        explanation: "Every virus possesses a capsid and a genome. Envelopes and spikes are optional, and viruses lack metabolic machinery."
+      },
+      {
+        lec: 3,
+        type: "sata",
+        text: "Which structural proteins are embedded directly in the outer envelope of the SARS-CoV-2 virus? (SELECT ALL THAT APPLY)",
+        options: [
+          { text: "S protein (Spike)", correct: true },
+          { text: "E protein (Envelope)", correct: true },
+          { text: "M protein (Membrane)", correct: true },
+          { text: "N protein (Nucleocapsid bound internally to RNA)", correct: false },
+          { text: "Reverse transcriptase enzyme core", correct: false }
+        ],
+        explanation: "S, E, and M proteins are embedded in the outer envelope. The N protein is located inside bound to RNA."
+      },
+      {
+        lec: 3,
+        type: "mcq",
+        text: "What is the exact sequential order of the stages of animal virus replication?",
+        options: [
+          { text: "Attachment -> Penetration -> Uncoating -> Biosynthesis -> Maturation -> Release", correct: true },
+          { text: "Attachment -> Uncoating -> Penetration -> Maturation -> Release -> Biosynthesis", correct: false },
+          { text: "Penetration -> Attachment -> Biosynthesis -> Uncoating -> Release -> Maturation", correct: false },
+          { text: "Attachment -> Penetration -> Biosynthesis -> Uncoating -> Maturation -> Release", correct: false },
+          { text: "Attachment -> Penetration -> Uncoating -> Maturation -> Biosynthesis -> Release", correct: false }
+        ],
+        explanation: "Animal virus replication follows: Attachment -> Penetration -> Uncoating -> Biosynthesis -> Maturation -> Release. Phages do not uncoat."
+      },
+      {
+        lec: 3,
+        type: "sata",
+        text: "Which statements accurately describe prions and transmissible spongiform encephalopathies (TSEs)? (SELECT ALL THAT APPLY)",
+        options: [
+          { text: "Prions are proteinaceous infectious particles containing zero DNA or RNA.", correct: true },
+          { text: "They cause fatal neurodegenerative diseases resulting in sponge-like brain holes.", correct: true },
+          { text: "Infectious PrP^sc prions convert healthy PrP^c proteins by forcing them to refold into flat sheets.", correct: true },
+          { text: "Standard sterilization fails; they must be destroyed by burning (incineration).", correct: true },
+          { text: "Prions are readily destroyed by alcohol-based hand sanitizers and boiling water.", correct: false }
+        ],
+        explanation: "Prions are protein-only, cause TSEs, refold healthy proteins, and resist standard disinfection, requiring incineration."
+      },
+      {
+        lec: 3,
+        type: "mcq",
+        text: "Where does the outer lipid envelope of an enveloped virus biologically originate?",
+        options: [
+          { text: "Stolen from the human host cell's membrane during budding", correct: true },
+          { text: "Synthesized independently using viral DNA and bacterial ribosomes", correct: false },
+          { text: "Assembled from peptidoglycan and teichoic acid monomers", correct: false },
+          { text: "Constructed from host cellular nuclear chromatin", correct: false }
+        ],
+        explanation: "Enveloped viruses steal a piece of the human host cell membrane when exiting via budding."
+      },
+      {
+        lec: 3,
+        type: "mcq",
+        text: "Which viral family is characterized by having a naked (non-enveloped), icosahedral structure, very small size (~30 nm), single-stranded RNA, and includes the Polio virus?",
+        options: [
+          { text: "Picornaviridae", correct: true },
+          { text: "Herpesviridae", correct: false },
+          { text: "Orthomyxoviridae", correct: false },
+          { text: "Coronaviridae", correct: false }
+        ],
+        explanation: "Picornaviridae means 'pico' = small, 'rna' = RNA, and includes polio."
+      },
+      {
+        lec: 3,
+        type: "mcq",
+        text: "What is the key physiological difference between how animal viruses and bacterial viruses (bacteriophages) infect a host cell?",
+        options: [
+          { text: "Animal viruses enter whole and uncoat inside, whereas phages inject their genome like a syringe.", correct: true },
+          { text: "Bacteriophages steal host membranes to form envelopes, while animal viruses are always naked.", correct: false },
+          { text: "Animal viruses lack capsids entirely.", correct: false },
+          { text: "Phages undergo uncoating in the cytoplasm, while animal viruses do not.", correct: false }
+        ],
+        explanation: "Animal viruses enter completely and uncoat; phages inject their DNA, leaving the capsid outside."
+      },
+      {
+        lec: 3,
+        type: "mcq",
+        text: "During which viral life cycle state does the virus integrate its genetic material into host DNA (as a provirus), causing no active symptoms while the host cell divides normally?",
+        options: [
+          { text: "Lysogenic cycle", correct: true },
+          { text: "Lytic cycle", correct: false },
+          { text: "Maturation phase", correct: false },
+          { text: "Burst time phase", correct: false }
+        ],
+        explanation: "The lysogenic cycle represents a dormant state where viral DNA integrates into host DNA without symptoms."
+      },
+      {
+        lec: 3,
+        type: "mcq",
+        text: "How do oncogenic viruses (such as HPV or Hepatitis B) cause cancer in humans?",
+        options: [
+          { text: "By inserting viral DNA into host genes, disrupting regulatory 'stop' codons and causing uncontrolled cell division", correct: true },
+          { text: "By dissolving all host ribosomes during the uncoating phase", correct: false },
+          { text: "By converting healthy PrP^c proteins into disease-causing PrP^sc sheets", correct: false },
+          { text: "By releasing massive amounts of peptidoglycan endotoxins into blood", correct: false }
+        ],
+        explanation: "Oncogenic viruses disrupt normal stop genes in host DNA, leading to uncontrolled proliferation and cancer."
+      },
+      {
+        lec: 3,
+        type: "mcq",
+        text: "What specific viral component does a rapid antigen test for SARS-CoV-2 typically detect?",
+        options: [
+          { text: "Viral structural proteins (such as the N-protein)", correct: true },
+          { text: "Double-stranded viral DNA genomes", correct: false },
+          { text: "Human host antibodies against the virus", correct: false },
+          { text: "Bacterial peptidoglycan cell walls", correct: false }
+        ],
+        explanation: "Rapid antigen tests detect physical viral proteins, frequently the abundant nucleocapsid (N) protein."
+      },
+      {
+        lec: 3,
+        type: "mcq",
+        text: "Why does an rRT-PCR test for SARS-CoV-2 require a 'Reverse Transcription' step prior to amplification?",
+        options: [
+          { text: "Because SARS-CoV-2 is an RNA virus and PCR machines can only amplify DNA.", correct: true },
+          { text: "To strip away the stolen host cell lipid envelope.", correct: false },
+          { text: "To convert host cellular prions into normal coiled helices.", correct: false },
+          { text: "To stain the viral capsomeres with crystal violet.", correct: false }
+        ],
+        explanation: "PCR requires DNA; RNA viruses must undergo reverse transcription to convert their RNA genome into DNA."
+      },
+      {
+        lec: 3,
+        type: "mcq",
+        text: "What does a blank (missing) line at the 'C' (Control) marker on a rapid antigen test indicate?",
+        options: [
+          { text: "The test is invalid and useless because the control line must always show up.", correct: true },
+          { text: "The patient has a severely elevated viral load.", correct: false },
+          { text: "The patient is completely negative for active infection.", correct: false },
+          { text: "The virus has successfully entered the lysogenic cycle.", correct: false }
+        ],
+        explanation: "The Control (C) line validates test reagents and fluid flow; if absent, the test is invalid."
+      },
+      {
+        lec: 3,
+        type: "mcq",
+        text: "Thinking Application: If an HIV patient enters active AIDS with severe symptoms and immune collapse, which viral cycle is predominantly occurring?",
+        options: [
+          { text: "The Lytic cycle", correct: true },
+          { text: "The Lysogenic dormancy cycle", correct: false },
+          { text: "The Endospore survival phase", correct: false },
+          { text: "The Binomial resting phase", correct: false }
+        ],
+        explanation: "Active symptoms and cell destruction signify the lytic cycle where the virus wakes up and replicates actively."
+      },
+      {
+        lec: 3,
+        type: "mcq",
+        text: "Thinking Application: How does a healthy cellular prion protein (PrP^c) structurally differ from an infectious disease-causing prion (PrP^sc)?",
+        options: [
+          { text: "PrP^c is shaped like coiled helices, whereas PrP^sc is flattened into sheets.", correct: true },
+          { text: "PrP^c contains double-stranded DNA, whereas PrP^sc contains single-stranded RNA.", correct: false },
+          { text: "PrP^c is enveloped in a lipid bilayer, while PrP^sc is naked.", correct: false },
+          { text: "PrP^c is a prokaryotic cell wall, while PrP^sc is an endospore.", correct: false }
+        ],
+        explanation: "Healthy PrP^c features coiled helices, while infectious PrP^sc is flattened into sheets that resist enzymes."
+      },
+    ];
+
+    // Additional questions based only on supplied lecture and malaria-reading points.
+    const addedQuestions =       [
+            {
+                              "lec": 3,
+                              "type": "mcq",
+                              "text": "Which statement about a virus’s genome is correct?",
+                              "options": [
+                                                {
+                                                                  "text": "A virus contains genetic material in the form of DNA or RNA.",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "Every virus contains both DNA and RNA as its genome.",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "A virus genome is always made of protein rather than nucleic acid.",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "A virus genome is stored inside a membrane-bound nucleus.",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "A virus has no genetic material if it has a capsid.",
+                                                                  "correct": false
+                                                }
+                              ],
+                              "explanation": "The lecture material describes the viral genome as genetic material made of DNA or RNA."
+            },
+            {
+                              "lec": 3,
+                              "type": "mcq",
+                              "text": "During animal virus replication, which stage follows penetration?",
+                              "options": [
+                                                {
+                                                                  "text": "Uncoating",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "Attachment",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Release",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Maturation",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Biosynthesis",
+                                                                  "correct": false
+                                                }
+                              ],
+                              "explanation": "The sequence is attachment, penetration, uncoating, biosynthesis, maturation, and release."
+            },
+            {
+                              "lec": 3,
+                              "type": "mcq",
+                              "text": "How does a bacteriophage introduce its genetic material into a bacterial host?",
+                              "options": [
+                                                {
+                                                                  "text": "It injects its genome into the host, leaving the capsid outside.",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "It enters the host whole and uncoats inside the cytoplasm.",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "It forms a lipid envelope from the host membrane before entry.",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "It releases its genome into the host by budding from the nucleus.",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "It converts its genome into a bacterial endospore.",
+                                                                  "correct": false
+                                                }
+                              ],
+                              "explanation": "The provided material contrasts animal viruses, which enter and uncoat, with bacteriophages, which inject their genome."
+            },
+            {
+                              "lec": 3,
+                              "type": "mcq",
+                              "text": "Which description matches the lysogenic cycle?",
+                              "options": [
+                                                {
+                                                                  "text": "Viral genetic material integrates into host DNA and can remain without active symptoms while the host cell divides.",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "The virus immediately releases many new particles by destroying the host cell.",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "The virus forms hypnozoites in liver tissue for weeks to months.",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "The virus builds a peptidoglycan cell wall around its genome.",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "The virus changes into a bacterial endospore before replication.",
+                                                                  "correct": false
+                                                }
+                              ],
+                              "explanation": "The lysogenic cycle is described as a dormant state in which viral DNA integrates into host DNA."
+            },
+            {
+                              "lec": 3,
+                              "type": "mcq",
+                              "text": "What do rapid antigen tests for SARS-CoV-2 detect?",
+                              "options": [
+                                                {
+                                                                  "text": "Viral structural proteins, such as the nucleocapsid protein",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "Only the patient’s human antibodies",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Double-stranded viral DNA in every case",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Bacterial peptidoglycan in the respiratory tract",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "The prion protein PrP-sc in the blood",
+                                                                  "correct": false
+                                                }
+                              ],
+                              "explanation": "Rapid antigen tests detect viral proteins, including the nucleocapsid protein."
+            },
+            {
+                              "lec": 3,
+                              "type": "sata",
+                              "text": "Which statements correctly match viral structure, replication, and detection? (SELECT ALL THAT APPLY)",
+                              "options": [
+                                                {
+                                                                  "text": "An enveloped virus can obtain its outer lipid envelope from a host-cell membrane during budding.",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "Animal viruses can enter a host cell whole and uncoat inside it.",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "Bacteriophages inject their genome and leave the capsid outside the bacterial host.",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "A SARS-CoV-2 rapid antigen test can detect viral structural proteins.",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "Reverse transcription is unnecessary when amplifying an RNA genome by PCR.",
+                                                                  "correct": false
+                                                }
+                              ],
+                              "explanation": "The lecture material describes host-derived envelopes, animal-virus uncoating, genome injection by phages, and protein-based antigen detection. RNA must be converted to DNA for PCR amplification."
+            },
+            {
+                              "lec": 4,
+                              "type": "sata",
+                              "text": "Which characteristics distinguish fungi from plants? (SELECT ALL THAT APPLY)",
+                              "options": [
+                                                {
+                                                                  "text": "Fungal cell walls are made of chitin rather than cellulose.",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "Fungi lack chlorophyll.",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "Fungi are heterotrophs that obtain food from their surroundings.",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "Some fungi, such as yeast, are single-celled.",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "Fungi make their own food using sunlight and chlorophyll.",
+                                                                  "correct": false
+                                                }
+                              ],
+                              "explanation": "The study guide distinguishes fungi from plants by their chitin cell walls, lack of chlorophyll, heterotrophic nutrition, and the fact that some fungi are single-celled."
+            },
+            {
+                              "lec": 4,
+                              "type": "mcq",
+                              "text": "What is the scientific study of fungi called?",
+                              "options": [
+                                                {
+                                                                  "text": "Mycology",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "Parasitology",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Histology",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Bacteriology",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Epidemiology",
+                                                                  "correct": false
+                                                }
+                              ],
+                              "explanation": "Mycology is the study of fungi."
+            },
+            {
+                              "lec": 4,
+                              "type": "mcq",
+                              "text": "Which statement correctly distinguishes a hypha from a mycelium?",
+                              "options": [
+                                                {
+                                                                  "text": "A hypha is one chain of fungal cells; a mycelium is many hyphae joined together.",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "A hypha is a resting protozoan form; a mycelium is an active form.",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "A hypha is a fungal spore; a mycelium is a yeast bud.",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "A hypha is a fungal cell wall; a mycelium is a cell membrane.",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Hypha and mycelium both refer only to single-celled yeast.",
+                                                                  "correct": false
+                                                }
+                              ],
+                              "explanation": "A hypha is one chain of fungal cells. A mycelium is a network of many hyphae joined together."
+            },
+            {
+                              "lec": 4,
+                              "type": "mcq",
+                              "text": "According to the study guide, which fungi are an exception to the rule that fungi need oxygen?",
+                              "options": [
+                                                {
+                                                                  "text": "Yeasts",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "All molds",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Dermatophytes only",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "All mushrooms",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Aspergillus only",
+                                                                  "correct": false
+                                                }
+                              ],
+                              "explanation": "The study guide says fungi are obligate aerobes except for yeast, which can grow with or without oxygen."
+            },
+            {
+                              "lec": 4,
+                              "type": "sata",
+                              "text": "Which statements about fungal reproduction and yeast are accurate? (SELECT ALL THAT APPLY)",
+                              "options": [
+                                                {
+                                                                  "text": "Molds reproduce using spores.",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "Mushrooms reproduce using spores.",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "Yeasts reproduce by budding.",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "Yeast can grow with or without oxygen.",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "Yeasts reproduce mainly by forming hyphae and releasing spores.",
+                                                                  "correct": false
+                                                }
+                              ],
+                              "explanation": "The guide states that molds and mushrooms use spores, while yeasts use budding. Yeast is also facultative and does not have hyphae."
+            },
+            {
+                              "lec": 4,
+                              "type": "mcq",
+                              "text": "Which pairing of oxygen availability and yeast fermentation product is correct according to the study guide?",
+                              "options": [
+                                                {
+                                                                  "text": "Without oxygen: alcohol; with oxygen: carbon dioxide (CO2)",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "Without oxygen: carbon dioxide; with oxygen: alcohol",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Without oxygen: penicillin; with oxygen: chitin",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Without oxygen: folic acid; with oxygen: ergosterol",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Yeast produces the same product whether oxygen is present or absent",
+                                                                  "correct": false
+                                                }
+                              ],
+                              "explanation": "The guide states that yeast uses glucose to produce carbon dioxide with oxygen and alcohol without oxygen."
+            },
+            {
+                              "lec": 4,
+                              "type": "mcq",
+                              "text": "According to the lecture notes, antibiotics with names ending in “-illin” are associated with which source?",
+                              "options": [
+                                                {
+                                                                  "text": "Penicillin mold",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "Candida albicans",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Entamoeba histolytica",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Plasmodium species",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Dermatophytes",
+                                                                  "correct": false
+                                                }
+                              ],
+                              "explanation": "The study guide states that penicillin mold makes antibiotics and links the drug ending “-illin” to penicillin."
+            },
+            {
+                              "lec": 4,
+                              "type": "mcq",
+                              "text": "What role do most fungi play in nature, according to the study guide?",
+                              "options": [
+                                                {
+                                                                  "text": "They act as saprobes, eating dead material and recycling carbon and minerals.",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "They make their own food through photosynthesis.",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "They only survive by infecting living humans.",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "They convert all cellulose directly into chlorophyll.",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "They prevent all forms of bacterial growth in nature.",
+                                                                  "correct": false
+                                                }
+                              ],
+                              "explanation": "Most fungi are saprobes that consume dead material and recycle carbon and minerals back into nature."
+            },
+            {
+                              "lec": 4,
+                              "type": "mcq",
+                              "text": "Human fungal diseases are called mycoses. What does it mean when a fungus is described as an opportunistic pathogen?",
+                              "options": [
+                                                {
+                                                                  "text": "It can cause disease when conditions allow, such as when a person's defences are weakened.",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "It always causes severe disease in every person it contacts.",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "It can reproduce only inside red blood cells.",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "It is a fungus that makes its own food using sunlight.",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "It is a fungus that cannot live on or around humans.",
+                                                                  "correct": false
+                                                }
+                              ],
+                              "explanation": "The guide explains that many fungi are opportunistic: they normally live on or around us and may cause disease when conditions, such as weakened immunity, allow."
+            },
+            {
+                              "lec": 4,
+                              "type": "sata",
+                              "text": "Which fungal infection, cause, or treatment pairings are correctly matched? (SELECT ALL THAT APPLY)",
+                              "options": [
+                                                {
+                                                                  "text": "Cryptococcosis — Cryptococcus neoformans — fluconazole.",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "Tinea/ringworm — dermatophytes — clotrimazole.",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "Blastomycosis — Blastomyces dermatitidis — amphotericin.",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "Candidiasis — Candida albicans — nystatin.",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "Candidiasis — Candida albicans — quinine.",
+                                                                  "correct": false
+                                                }
+                              ],
+                              "explanation": "The guide pairs cryptococcosis with fluconazole, tinea with clotrimazole, blastomycosis with amphotericin, and candidiasis with nystatin. Quinine is discussed as an antimalarial, not a treatment for candidiasis."
+            },
+            {
+                              "lec": 4,
+                              "type": "mcq",
+                              "text": "A patient develops oral thrush after a prolonged course of antibiotics. Which organism is the most likely cause, according to the guide?",
+                              "options": [
+                                                {
+                                                                  "text": "Candida albicans",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "Cryptococcus neoformans",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Blastomyces dermatitidis",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Entamoeba histolytica",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Toxoplasma gondii",
+                                                                  "correct": false
+                                                }
+                              ],
+                              "explanation": "Candida albicans normally lives on areas such as the mouth and can overgrow after long-term antibiotics kill bacteria that keep yeast in check."
+            },
+            {
+                              "lec": 4,
+                              "type": "mcq",
+                              "text": "Dermatophytes cause tinea infections because they need which substance to grow?",
+                              "options": [
+                                                {
+                                                                  "text": "Keratin in skin, hair, and nails",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "Chlorophyll in green plant tissue",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Folic acid in red blood cells",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Cellulose in the plant cell wall",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Hemoglobin in plasma",
+                                                                  "correct": false
+                                                }
+                              ],
+                              "explanation": "Dermatophytes are molds that need keratin, a protein in dead skin cells, to grow. The guide lists tinea pedis, capitis, corporis, and cruris."
+            },
+            {
+                              "lec": 4,
+                              "type": "mcq",
+                              "text": "How is cryptococcosis commonly acquired, according to the study guide?",
+                              "options": [
+                                                {
+                                                                  "text": "By breathing in Cryptococcus neoformans from soil or bird-dropping sources carried in the air",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "By swallowing Plasmodium hypnozoites in drinking water",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "By contact with tinea-infected locker-room floors only",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "By eating undercooked beef containing Toxoplasma gondii only",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "By a mosquito bite transmitting Candida albicans",
+                                                                  "correct": false
+                                                }
+                              ],
+                              "explanation": "The guide says Cryptococcus neoformans can be found in soil and bird droppings, can become airborne, and is acquired by inhalation."
+            },
+            {
+                              "lec": 4,
+                              "type": "mcq",
+                              "text": "Aflatoxin is a liver poison that can cause cancer. Which fungus is identified in the guide as producing it?",
+                              "options": [
+                                                {
+                                                                  "text": "Aspergillus",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "Candida albicans",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Cryptococcus neoformans",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Blastomyces dermatitidis",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Saccharomyces",
+                                                                  "correct": false
+                                                }
+                              ],
+                              "explanation": "The guide associates aflatoxin with Aspergillus mold found on unsalted, untreated, uncooked shelled peanuts."
+            },
+            {
+                              "lec": 4,
+                              "type": "sata",
+                              "text": "Which statements about protozoa are accurate? (SELECT ALL THAT APPLY)",
+                              "options": [
+                                                {
+                                                                  "text": "Amoebas move using pseudopodia.",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "Flagellates move using flagella.",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "Ciliates move using cilia.",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "Apicomplexans do not move on their own.",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "The trophozoite is the tough resting form that usually spreads between people.",
+                                                                  "correct": false
+                                                }
+                              ],
+                              "explanation": "The guide groups protozoa by movement: amoebas use pseudopodia, flagellates use flagella, ciliates use cilia, and apicomplexans do not move on their own. The cyst is the tough resting form; the trophozoite is the growing, disease-causing form."
+            },
+            {
+                              "lec": 4,
+                              "type": "mcq",
+                              "text": "Which statement correctly compares the two main protozoan forms described in the guide?",
+                              "options": [
+                                                {
+                                                                  "text": "The trophozoite is the growing, disease-causing form; the cyst is the tough resting form that usually spreads.",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "The trophozoite is always dormant; the cyst is the form that actively causes disease.",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Both forms are fungal structures made from hyphae.",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "The cyst is a mosquito stage, and the trophozoite is a fungal spore.",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "The trophozoite and cyst are names for the same form and function.",
+                                                                  "correct": false
+                                                }
+                              ],
+                              "explanation": "The trophozoite is the growing form associated with disease. The cyst is dormant, tough, and usually serves as the spreading form."
+            },
+            {
+                              "lec": 4,
+                              "type": "mcq",
+                              "text": "How do most protozoa reproduce, according to the study guide?",
+                              "options": [
+                                                {
+                                                                  "text": "Asexually by binary fission",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "Only by budding",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Only by forming fungal spores",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "By forming hyphae and mycelia",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Only through mosquito transmission",
+                                                                  "correct": false
+                                                }
+                              ],
+                              "explanation": "Most protozoa reproduce asexually by binary fission, in which one cell splits into two."
+            },
+            {
+                              "lec": 4,
+                              "type": "mcq",
+                              "text": "A patient has abdominal pain and bloody stool after exposure to feces-contaminated food or water. Which organism and treatment combination matches the guide's section on amoebiasis?",
+                              "options": [
+                                                {
+                                                                  "text": "Entamoeba histolytica; metronidazole and paromomycin",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "Toxoplasma gondii; fluconazole and nystatin",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Candida albicans; quinine and Malarone",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Cryptococcus neoformans; paromomycin and clotrimazole",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Blastomyces dermatitidis; metronidazole and sulfadiazine",
+                                                                  "correct": false
+                                                }
+                              ],
+                              "explanation": "Amoebiasis is caused by Entamoeba histolytica and can spread when cysts from feces contaminate food or water. The guide lists metronidazole and paromomycin as treatments."
+            },
+            {
+                              "lec": 4,
+                              "type": "mcq",
+                              "text": "Which advice best reduces the risk of toxoplasmosis described in the guide?",
+                              "options": [
+                                                {
+                                                                  "text": "Avoid changing cat litter during pregnancy and cook meat thoroughly.",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "Use alcohol-based hand sanitizer instead of washing hands after every exposure.",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Avoid all foods containing carbohydrates.",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Take clotrimazole before entering a shared shower.",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Avoid all contact with drinking water, including boiled water.",
+                                                                  "correct": false
+                                                }
+                              ],
+                              "explanation": "The guide identifies soil, cat feces, and undercooked beef as sources of Toxoplasma gondii and advises avoiding litter-box exposure during pregnancy and cooking meat thoroughly."
+            },
+            {
+                              "lec": 4,
+                              "type": "mcq",
+                              "text": "How do sulfonamide antibiotics such as sulfadiazine treat toxoplasmosis, according to the study guide?",
+                              "options": [
+                                                {
+                                                                  "text": "They block folic acid synthesis in the protozoan.",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "They block fungal sterol formation.",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "They stop fungal budding.",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "They prevent mosquitoes from developing in the midgut.",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "They block keratin production in human skin.",
+                                                                  "correct": false
+                                                }
+                              ],
+                              "explanation": "The guide says sulfonamides block folic acid synthesis. The protozoa make their own folic acid, whereas humans obtain folate from food."
+            },
+            {
+                              "lec": 5,
+                              "type": "sata",
+                              "text": "Which statements match the 2019 malaria case figures supplied in the reading notes? (SELECT ALL THAT APPLY)",
+                              "options": [
+                                                {
+                                                                  "text": "The notes give 229 million cases worldwide.",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "The notes assign 94% of cases to Africa.",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "The notes assign 3% of cases to Southeast Asia.",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "The notes assign 94% of cases to Southeast Asia.",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "The notes assign 3% of cases to Africa.",
+                                                                  "correct": false
+                                                }
+                              ],
+                              "explanation": "The reading notes list 229 million total cases in 2019, with 94% in Africa and 3% in Southeast Asia."
+            },
+            {
+                              "lec": 5,
+                              "type": "mcq",
+                              "text": "How many Plasmodium species are listed in the supplied malaria reading notes?",
+                              "options": [
+                                                {
+                                                                  "text": "Five",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "Two",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Three",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Four",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Six",
+                                                                  "correct": false
+                                                }
+                              ],
+                              "explanation": "The notes list P. falciparum, P. vivax, P. malariae, P. ovale, and P. knowlesi."
+            },
+            {
+                              "lec": 5,
+                              "type": "mcq",
+                              "text": "Which species is identified as causing the most severe malaria?",
+                              "options": [
+                                                {
+                                                                  "text": "Plasmodium falciparum",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "Plasmodium vivax",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Plasmodium malariae",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Plasmodium ovale",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Plasmodium knowlesi",
+                                                                  "correct": false
+                                                }
+                              ],
+                              "explanation": "The reading notes identify P. falciparum as causing the most severe malaria."
+            },
+            {
+                              "lec": 5,
+                              "type": "mcq",
+                              "text": "Which pair of species is associated with dormant liver hypnozoites?",
+                              "options": [
+                                                {
+                                                                  "text": "P. vivax and P. ovale",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "P. falciparum and P. malariae",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "P. knowlesi and P. falciparum",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "P. malariae and P. ovale",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "All five species",
+                                                                  "correct": false
+                                                }
+                              ],
+                              "explanation": "The notes associate hypnozoites with P. vivax and P. ovale."
+            },
+            {
+                              "lec": 5,
+                              "type": "sata",
+                              "text": "Which statements about liver dormancy are supported by the supplied reading notes? (SELECT ALL THAT APPLY)",
+                              "options": [
+                                                {
+                                                                  "text": "The dormant forms are called hypnozoites.",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "Dormancy can last weeks to months.",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "P. vivax is one of the two species associated with hypnozoites.",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "P. ovale is one of the two species associated with hypnozoites.",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "The notes say all five listed species form hypnozoites.",
+                                                                  "correct": false
+                                                }
+                              ],
+                              "explanation": "The supplied notes describe hypnozoites in P. vivax and P. ovale that can remain dormant for weeks to months."
+            },
+            {
+                              "lec": 5,
+                              "type": "mcq",
+                              "text": "How long can liver dormancy last according to the notes?",
+                              "options": [
+                                                {
+                                                                  "text": "Weeks to months",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "Only 48 hours",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Only 72 hours",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "A few minutes",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Exactly one year in every case",
+                                                                  "correct": false
+                                                }
+                              ],
+                              "explanation": "The notes describe liver dormancy as lasting weeks to months."
+            },
+            {
+                              "lec": 5,
+                              "type": "mcq",
+                              "text": "In the mosquito, where does the parasite develop before moving to the salivary glands?",
+                              "options": [
+                                                {
+                                                                  "text": "Midgut",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "Liver",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Vascular endothelium",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Uninfected red blood cells",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Blood-smear slide",
+                                                                  "correct": false
+                                                }
+                              ],
+                              "explanation": "The notes state that development occurs in the mosquito midgut before migration to the salivary glands."
+            },
+            {
+                              "lec": 5,
+                              "type": "mcq",
+                              "text": "After the mosquito-stage development described in the notes, where do the parasites migrate?",
+                              "options": [
+                                                {
+                                                                  "text": "Salivary glands",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "Liver cells",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Blood-smear slide",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Antigen test strip",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Vascular endothelial nuclei",
+                                                                  "correct": false
+                                                }
+                              ],
+                              "explanation": "The notes say the parasites migrate from the midgut to the mosquito salivary glands."
+            },
+            {
+                              "lec": 5,
+                              "type": "sata",
+                              "text": "Which fever-cycle statements are correctly matched in the supplied malaria reading? (SELECT ALL THAT APPLY)",
+                              "options": [
+                                                {
+                                                                  "text": "Tertian fever is associated with a 48-hour cycle.",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "Quartan fever is associated with a 72-hour cycle.",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "The notes give 48 hours for quartan fever and 72 hours for tertian fever.",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "The listed tertian and quartan intervals are both 24 hours.",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "The notes describe these fever intervals as lasting weeks to months.",
+                                                                  "correct": false
+                                                }
+                              ],
+                              "explanation": "The supplied notes associate tertian fever with 48 hours and quartan fever with 72 hours."
+            },
+            {
+                              "lec": 5,
+                              "type": "mcq",
+                              "text": "Which description matches cytoadherence in the supplied notes?",
+                              "options": [
+                                                {
+                                                                  "text": "Parasitized RBCs bind to vascular endothelial cells and uninfected RBCs.",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "Mosquito parasites bind only to the salivary glands and never to RBCs.",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Hypnozoites bind only to the surface of sporozoites.",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Antigen tests bind to the mosquito midgut to identify fever cycles.",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Uninfected RBCs migrate into the mosquito salivary glands.",
+                                                                  "correct": false
+                                                }
+                              ],
+                              "explanation": "Cytoadherence is described as parasitized RBCs binding vascular endothelial cells and uninfected RBCs."
+            },
+            {
+                              "lec": 5,
+                              "type": "mcq",
+                              "text": "Which diagnostic approach relies on microscopic detection from a blood smear?",
+                              "options": [
+                                                {
+                                                                  "text": "Blood-smear microscopy",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "Indoor residual spraying",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Long-lasting insecticide-treated nets",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Suppressive prophylaxis",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "PfCSP vaccination",
+                                                                  "correct": false
+                                                }
+                              ],
+                              "explanation": "Microscopic detection from blood smears is one of the diagnostic approaches in the notes."
+            },
+            {
+                              "lec": 5,
+                              "type": "mcq",
+                              "text": "Which type of rapid diagnostic test is listed for malaria?",
+                              "options": [
+                                                {
+                                                                  "text": "An antigen-based RDT",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "A test that measures only the 72-hour fever interval",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "A test based on detecting a mosquito midgut",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "A test that identifies only vascular endothelial cells",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "A test for viral nucleocapsid protein",
+                                                                  "correct": false
+                                                }
+                              ],
+                              "explanation": "The notes list antigen-based rapid diagnostic tests."
+            },
+            {
+                              "lec": 5,
+                              "type": "mcq",
+                              "text": "Which group contains the antimalarial categories listed in the notes?",
+                              "options": [
+                                                {
+                                                                  "text": "Quinoline derivatives, antifolates, and artemisinin derivatives",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "Antigen tests, blood smears, and insecticide-treated nets",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Hypnozoites, salivary glands, and vascular endothelial cells",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "PfCSP, indoor spraying, and quartan fever",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Capsids, prions, and reverse transcriptase",
+                                                                  "correct": false
+                                                }
+                              ],
+                              "explanation": "The three antimalarial categories listed are quinoline derivatives, antifolates, and artemisinin derivatives."
+            },
+            {
+                              "lec": 5,
+                              "type": "mcq",
+                              "text": "Which stage does casual prophylaxis target?",
+                              "options": [
+                                                {
+                                                                  "text": "The pre-erythrocytic (liver) stage",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "The asexual blood (erythrocytic) stage",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Only the mosquito midgut",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Only the salivary glands",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "The antigen-based diagnostic stage",
+                                                                  "correct": false
+                                                }
+                              ],
+                              "explanation": "The notes define casual prophylaxis as targeting the pre-erythrocytic liver stage."
+            },
+            {
+                              "lec": 5,
+                              "type": "mcq",
+                              "text": "Which stage does suppressive prophylaxis target?",
+                              "options": [
+                                                {
+                                                                  "text": "The asexual blood (erythrocytic) stage",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "The pre-erythrocytic (liver) stage",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Only the mosquito midgut",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Only the sporozoite surface protein",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "The blood-smear reading process",
+                                                                  "correct": false
+                                                }
+                              ],
+                              "explanation": "The notes define suppressive prophylaxis as targeting the asexual blood stage."
+            },
+            {
+                              "lec": 5,
+                              "type": "mcq",
+                              "text": "What protein is named as the vaccine target, and where is it located?",
+                              "options": [
+                                                {
+                                                                  "text": "Circumsporozoite protein (PfCSP), on the surface of sporozoites",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "Nucleocapsid protein, inside every RBC",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Peptidoglycan, on the malaria parasite’s midgut",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "PrP-sc, on the salivary gland surface",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Endotoxin, on the surface of hypnozoites",
+                                                                  "correct": false
+                                                }
+                              ],
+                              "explanation": "The reading notes identify PfCSP on the surface of sporozoites as the vaccine target."
+            },
+            {
+                              "lec": 5,
+                              "type": "sata",
+                              "text": "Which measures are listed for reducing malaria transmission through vector control? (SELECT ALL THAT APPLY)",
+                              "options": [
+                                                {
+                                                                  "text": "Insecticide-treated nets (ITNs)",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "Long-lasting insecticidal nets (LLINs)",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "Indoor residual spraying (IRS)",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "Quinoline derivatives as a vector-control tool",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Blood-smear microscopy as a vector-control tool",
+                                                                  "correct": false
+                                                }
+                              ],
+                              "explanation": "The notes list ITNs/LLINs and IRS as vector-control measures."
+            },
+            {
+                              "lec": 5,
+                              "type": "mcq",
+                              "text": "Which pair is made up entirely of vector-control measures from the notes?",
+                              "options": [
+                                                {
+                                                                  "text": "ITNs/LLINs and IRS",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "Blood-smear microscopy and RDTs",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Quinoline derivatives and antifolates",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Casual prophylaxis and suppressive prophylaxis",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Tertian fever and quartan fever",
+                                                                  "correct": false
+                                                }
+                              ],
+                              "explanation": "The supplied notes list insecticide-treated nets and indoor residual spraying as vector-control measures."
+            },
+            {
+                              "lec": 5,
+                              "type": "mcq",
+                              "text": "Which species-severity pairing is correct according to the supplied notes?",
+                              "options": [
+                                                {
+                                                                  "text": "P. falciparum — causes the most severe malaria",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "P. ovale — causes the most severe malaria",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "P. malariae — causes the most severe malaria",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "P. knowlesi — causes the most severe malaria",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "P. vivax — causes the most severe malaria",
+                                                                  "correct": false
+                                                }
+                              ],
+                              "explanation": "The notes specifically identify P. falciparum as causing the most severe malaria."
+            },
+            {
+                              "lec": 5,
+                              "type": "mcq",
+                              "text": "Which sequence matches the mosquito-related stages described in the supplied reading?",
+                              "options": [
+                                                {
+                                                                  "text": "Development in the midgut, then migration to the salivary glands",
+                                                                  "correct": true
+                                                },
+                                                {
+                                                                  "text": "Development in the salivary glands, then migration to the midgut",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Development in liver hypnozoites, then migration to a blood smear",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Development in RBCs, then migration to a rapid diagnostic test",
+                                                                  "correct": false
+                                                },
+                                                {
+                                                                  "text": "Development on the sporozoite surface, then migration to an IRS-treated wall",
+                                                                  "correct": false
+                                                }
+                              ],
+                              "explanation": "The notes describe development in the mosquito midgut followed by migration to its salivary glands."
+            }
+      ];
+    questionBank.push(...addedQuestions);
+
+    // ---------------------------------------------------------
+    // TEST LOGIC: shuffled lecture sets, filters, Submit, SATA partial credit
+    // ---------------------------------------------------------
+    let currentLec = "all";
+    let shuffledQuestions = [];
+    let activeQuestions = [];
+    // keyed by stable question id (the original position in questionBank)
+    const userState = new Map();
+
+    function shuffleArray(array) {
+        const arr = [...array];
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+
+    function buildShuffledQuestionSet() {
+        // Shuffle each lecture independently so every lecture is randomized,
+        // then shuffle the complete set so All mixes lectures and question types.
+        const grouped = [];
+        const lectureNumbers = [...new Set(questionBank.map(q => q.lec))].sort((a, b) => a - b);
+        for (const lec of lectureNumbers) {
+            const lectureQuestions = questionBank
+                .map((q, index) => ({ ...q, qid: index }))
+                .filter(q => q.lec === lec);
+            grouped.push(...shuffleArray(lectureQuestions).map(q => ({
+                ...q,
+                options: shuffleArray(q.options)
+            })));
+        }
+        shuffledQuestions = shuffleArray(grouped);
+    }
+
+    function setActiveQuestions(lec) {
+        currentLec = lec;
+        activeQuestions = lec === "all"
+            ? [...shuffledQuestions]
+            : shuffledQuestions.filter(q => q.lec === Number(lec));
+    }
+
+    function resetAttempt() {
+        userState.clear();
+        buildShuffledQuestionSet();
+        setActiveQuestions(currentLec);
+        renderQuestions();
+        updateScore();
+    }
+
+    function filterQuestions(lec, button) {
+        document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+        setActiveQuestions(lec);
+        renderQuestions();
+        updateScore();
+    }
+
+    function updateScore() {
+        let submittedCount = 0;
+        let totalScore = 0;
+
+        userState.forEach(state => {
+            if (state.submitted) {
+                submittedCount++;
+                totalScore += state.score;
+            }
+        });
+
+        const grade = submittedCount > 0
+            ? Math.round((totalScore / submittedCount) * 100)
+            : 0;
+
+        const scoreElem = document.getElementById('score-counter');
+        scoreElem.textContent = `Grade: ${grade}%`;
+        scoreElem.title = `Answered ${submittedCount} / ${questionBank.length}`;
+    }
+
+    function renderQuestions() {
+        const container = document.getElementById('questionsContainer');
+        container.innerHTML = '';
+        const letters = ['A', 'B', 'C', 'D', 'E'];
+
+        activeQuestions.forEach((q, displayIndex) => {
+            const state = userState.get(q.qid) || { submitted: false, selected: [], score: 0 };
+            const card = document.createElement('div');
+            card.className = 'q-card';
+            card.id = `qcard-${q.qid}`;
+
+            if (state.submitted) {
+                card.classList.add('answered');
+                if (state.score === 1) card.classList.add('is-correct');
+                else if (state.score > 0) card.classList.add('is-partial');
+                else card.classList.add('is-wrong');
+            }
+
+            let optionsHTML = '';
+            q.options.forEach((opt, optIndex) => {
+                let extraClass = '';
+                if (state.submitted) {
+                    if (opt.correct && state.score === 1) extraClass = 'user-correct';
+                    else if (opt.correct) extraClass = 'reveal-correct';
+                    else if (state.selected.includes(optIndex)) extraClass = 'user-wrong';
+                } else if (state.selected.includes(optIndex)) {
+                    extraClass = 'selected';
+                }
+
+                optionsHTML += `
+                    <button type="button" class="opt-btn ${extraClass}"
+                            ${state.submitted ? 'disabled' : ''}
+                            onclick="handleOptionClick(${q.qid}, ${optIndex})">
+                        <span class="opt-prefix">${letters[optIndex]}.</span>
+                        <span>${escapeHTML(opt.text)}</span>
+                    </button>
+                `;
+            });
+
+            const badge = q.type === 'sata' ? 'SATA' : 'MCQ';
+            const submitDisabled = state.submitted || state.selected.length === 0 ? 'disabled' : '';
+            const buttonText = state.submitted ? 'Submitted' : 'Submit Answer';
+
+            card.innerHTML = `
+                <div class="q-header">
+                    <span class="q-num">Question ${displayIndex + 1}</span>
+                    <span class="q-cat">${badge}</span>
+                </div>
+                <div class="q-text">${escapeHTML(q.text)}</div>
+                <div class="opt-list">${optionsHTML}</div>
+                <button class="submit-q-btn" id="btn_${q.qid}" ${submitDisabled}
+                        onclick="submitAnswer(${q.qid})">${buttonText}</button>
+                <div class="feedback-box" id="feedback_${q.qid}"></div>
+            `;
+
+            container.appendChild(card);
+            if (state.submitted) showFeedback(q.qid);
+        });
+    }
+
+    function handleOptionClick(qid, optIndex) {
+        const q = shuffledQuestions.find(item => item.qid === qid);
+        if (!q) return;
+
+        const existing = userState.get(qid) || { submitted: false, selected: [], score: 0 };
+        if (existing.submitted) return;
+
+        let selected;
+        if (q.type === 'mcq') {
+            selected = [optIndex];
+        } else {
+            selected = [...existing.selected];
+            const index = selected.indexOf(optIndex);
+            if (index >= 0) selected.splice(index, 1);
+            else selected.push(optIndex);
+        }
+
+        userState.set(qid, { submitted: false, selected, score: 0 });
+        renderQuestions();
+    }
+
+    function submitAnswer(qid) {
+        const q = shuffledQuestions.find(item => item.qid === qid);
+        const state = userState.get(qid);
+        if (!q || !state || state.selected.length === 0 || state.submitted) return;
+
+        state.submitted = true;
+
+        if (q.type === 'mcq') {
+            state.score = q.options[state.selected[0]]?.correct ? 1 : 0;
+        } else {
+            const totalCorrect = q.options.filter(option => option.correct).length;
+            let correctSelected = 0;
+            let incorrectSelected = 0;
+
+            state.selected.forEach(index => {
+                if (q.options[index]?.correct) correctSelected++;
+                else incorrectSelected++;
+            });
+
+            // Partial-credit scoring requested for SATA questions:
+            // +1/N for each correct selection, -1/N for each incorrect selection,
+            // with a minimum of 0 and a maximum of 1.
+            state.score = Math.min(1, Math.max(0, (correctSelected - incorrectSelected) / totalCorrect));
+        }
+
+        userState.set(qid, state);
+        updateScore();
+        renderQuestions();
+    }
+
+    function showFeedback(qid) {
+        const q = shuffledQuestions.find(item => item.qid === qid);
+        const state = userState.get(qid);
+        const fbBox = document.getElementById(`feedback_${qid}`);
+        if (!q || !state || !fbBox) return;
+
+        let statusClass = 'incorrect';
+        let titleText = '✗ Incorrect';
+
+        if (state.score === 1) {
+            statusClass = 'correct';
+            titleText = '✓ Correct!';
+        } else if (state.score > 0) {
+            statusClass = 'partial';
+            titleText = `Partial Credit (+${state.score.toFixed(2)})`;
+        }
+
+        fbBox.className = `feedback-box ${statusClass}`;
+        fbBox.style.display = 'block';
+        fbBox.innerHTML = `
+            <div class="feedback-title">${titleText}</div>
+            <div class="explanation">${escapeHTML(q.explanation)}</div>
+        `;
+    }
+
+    function escapeHTML(value) {
+        return String(value)
+            .replaceAll('&', '&amp;')
+            .replaceAll('<', '&lt;')
+            .replaceAll('>', '&gt;')
+            .replaceAll('"', '&quot;')
+            .replaceAll("'", '&#039;');
+    }
+
+    document.getElementById('navTabs').addEventListener('click', event => {
+        const button = event.target.closest('.filter-btn');
+        if (!button) return;
+        filterQuestions(button.dataset.lec, button);
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', resetAttempt);
+
+    // Default state: All questions visible, shuffled on page load.
+    buildShuffledQuestionSet();
+    setActiveQuestions('all');
+    renderQuestions();
+    updateScore();
+
+    </script>
+</body>
+</html>

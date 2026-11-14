@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MICR1500 Microbiology Practice Suite</title>
+<style>
+:root{--primary:#0f766e;--primary-dark:#0f172a;--primary-light:#14b8a6;--bg:#f8fafc;--card-bg:#fff;--text-main:#0f172a;--text-muted:#64748b;--border:#e2e8f0;--shadow:0 4px 6px -1px rgba(0,0,0,.1),0 2px 4px -2px rgba(0,0,0,.1);--shadow-hover:0 10px 15px -3px rgba(0,0,0,.1),0 4px 6px -4px rgba(0,0,0,.1)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text-main);line-height:1.6;min-height:100vh;display:flex;flex-direction:column}
+header{background:linear-gradient(135deg,var(--primary-dark),#1e293b 55%,var(--primary));color:#fff;padding:48px 20px;text-align:center;box-shadow:0 4px 12px rgba(0,0,0,.15)}
+.header-container{max-width:900px;margin:0 auto}header h1{font-size:2.25rem;font-weight:800;margin-bottom:8px;letter-spacing:-.02em}header p{font-size:1.05rem;color:#cbd5e1;max-width:700px;margin:0 auto}
+main{max-width:1000px;margin:40px auto;padding:0 20px;flex-grow:1;width:100%}
+.section-title{font-size:1.25rem;font-weight:700;color:var(--primary);margin-bottom:20px;display:flex;align-items:center;gap:10px}.section-title:after{content:"";flex:1;height:2px;background:var(--border)}
+.exam-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px}.exam-card{background:var(--card-bg);border:1px solid var(--border);border-radius:12px;padding:24px;box-shadow:var(--shadow);transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease;display:flex;flex-direction:column;justify-content:space-between;text-decoration:none;color:inherit;position:relative;overflow:hidden;min-height:220px}.exam-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-hover);border-color:var(--primary-light)}.exam-card.disabled{opacity:.68;pointer-events:none;background:#f1f5f9}
+.card-tag{align-self:flex-start;font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:4px 10px;border-radius:20px;background:#ccfbf1;color:#115e59;margin-bottom:12px}.card-tag.upcoming{background:#f3f4f6;color:var(--text-muted)}.card-title{font-size:1.2rem;font-weight:700;margin-bottom:8px;color:var(--text-main)}.card-desc{font-size:.88rem;color:var(--text-muted);margin-bottom:20px;flex-grow:1}.card-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:.85rem;font-weight:600;color:var(--primary);border-top:1px solid var(--border);padding-top:14px}.btn-action{display:inline-flex;align-items:center;gap:6px}
+.info-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:26px 0 0}.info-item{background:#fff;border:1px solid var(--border);border-radius:10px;padding:16px 18px;box-shadow:var(--shadow)}.info-value{font-size:1.35rem;font-weight:800;color:var(--primary)}.info-label{font-size:.78rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;font-weight:700}
+.schedule-card{margin-top:40px;background:var(--card-bg);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}.schedule-header{padding:18px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:12px}.schedule-header h2{font-size:1.05rem;font-weight:700;color:var(--primary)}.schedule-header span{font-size:.78rem;color:var(--text-muted)}.schedule-table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:720px}th,td{padding:12px 14px;text-align:left;border-bottom:1px solid var(--border);font-size:.84rem;vertical-align:top}th{background:#f8fafc;color:var(--text-muted);font-size:.76rem;text-transform:uppercase;letter-spacing:.04em}tr:last-child td{border-bottom:none}.test-row td{font-weight:600;background:#f0fdfa}.reading-week td{color:var(--text-muted);font-style:italic;background:#fafafa}.topic-list{padding-left:18px;margin:0}.topic-list li{margin:2px 0}
+.evaluation-wrap{padding:0 20px 20px}.evaluation-heading{font-size:1rem;color:var(--primary);margin:20px 0 10px}.evaluation-table{min-width:440px}.evaluation-table td:last-child,.evaluation-table th:last-child{text-align:right}.total-row td{font-weight:800;background:#f0fdfa}
+footer{text-align:center;padding:24px 20px;font-size:.85rem;color:var(--text-muted);border-top:1px solid var(--border);background:#fff;margin-top:36px}
+@media(max-width:640px){header{padding:36px 18px}header h1{font-size:1.8rem}header p{font-size:.95rem}main{margin:28px auto;padding:0 16px}.exam-grid{grid-template-columns:1fr}.schedule-header{align-items:flex-start;flex-direction:column}.info-strip{grid-template-columns:repeat(2,minmax(0,1fr))}}
+</style>
+</head>
+<body>
+<header>
+  <div class="header-container">
+    <h1>MICR1500 Microbiology Practice Suite</h1>
+    <p>Interactive practice exams and course review for Introduction to Microbiology, microorganisms, infection, control, body defences, and pathogenic microorganisms.</p>
+  </div>
+</header>
+<main>
+  <div class="section-title">Available Practice Exams</div>
+  <div class="exam-grid">
+    <a href="micr1500_practice_test1.html" class="exam-card">
+      <div>
+        <span class="card-tag">Active</span>
+        <h2 class="card-title">Term Test 1 Practice Exam</h2>
+        <p class="card-desc">Practice questions for Units 1 and 2: microbiology fundamentals and the characteristics of bacteria, viruses, prions, fungi, and protozoa. Includes a separate malaria reading section.</p>
+      </div>
+      <div class="card-footer"><span>Test 1 · Units 1–2</span><span class="btn-action">Start Exam &rarr;</span></div>
+    </a>
+    <a href="micr1500_term_test_2_practice_exam.html" class="exam-card">
+      <div>
+        <span class="card-tag">Active</span>
+        <h2 class="card-title">Term Test 2 Practice Exam</h2>
+        <p class="card-desc">Practice exam for infection and epidemiology, physical and chemical control of microorganisms, chemotherapeutics, and antibiotics. Features 124 questions</p>
+      </div>
+      <div class="card-footer"><span>Test 2 · Units 3–4</span><span class="btn-action">Start Exam &rarr;</span></div>
+    </a>
+    <a href="#" class="exam-card disabled" aria-disabled="true" tabindex="-1">
+      <div>
+        <span class="card-tag upcoming">Upcoming</span>
+        <h2 class="card-title">Final Exam Practice</h2>
+        <p class="card-desc">Future cumulative review covering Units 1–6, including body defences, immunity, and pathogenic microorganisms.</p>
+      </div>
+      <div class="card-footer"><span>Final · Units 1–6</span><span>Coming Soon</span></div>
+    </a>
+  </div>
+  <div class="info-strip" aria-label="Assessment overview">
+    <div class="info-item"><div class="info-value">8%</div><div class="info-label">Quizzes · Weeks 4–14</div></div>
+    <div class="info-item"><div class="info-value">28%</div><div class="info-label">Term Test 1 · Week 6</div></div>
+    <div class="info-item"><div class="info-value">28%</div><div class="info-label">Term Test 2 · Week 10</div></div>
+    <div class="info-item"><div class="info-value">36%</div><div class="info-label">Final Exam · Week 14</div></div>
+  </div>
+
+  <section class="schedule-card">
+    <div class="schedule-header"><h2>MICR1500 Course Schedule</h2><span>Units, topics, assessments &amp; readings</span></div>
+    <div class="schedule-table-wrap">
+      <table>
+        <thead><tr><th>Unit</th><th>Week(s)</th><th>Topics</th><th>Assessment</th><th>Resources · Keenlyside</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>1. Introduction to Microbiology</strong></td><td>Week 1</td>
+            <td><ul class="topic-list"><li>Basic definitions</li><li>Microbiology past and present</li></ul></td>
+            <td>&mdash;</td><td>Chapters 1.1, 16.2 (Table 16.3)</td>
+          </tr>
+          <tr>
+            <td><strong>2. Characteristics of Microorganisms</strong></td><td>Weeks 2–4</td>
+            <td><ul class="topic-list"><li>Bacteria</li><li>Viruses</li><li>Prions</li><li>Fungi</li><li>Protozoa</li></ul></td>
+            <td>Term Test 1 follows this unit; covers Units 1–2</td>
+            <td>Chapters 1.2, 1.3, 2.3 (brightfield, fluorescence, EM only), 2.4, 3.3, 4.1, 5.1 (pp. 297–303), 5.2, 6.1, 6.2, 6.4, 9.2, 9.3, 9.4, 9.6, 23.4, 27.3 (TSEs only)</td>
+          </tr>
+          <tr>
+            <td><strong>3. Infection and Epidemiology</strong></td><td>Weeks 5–6</td>
+            <td><ul class="topic-list"><li>Methods of transmission</li><li>Definitions in epidemiology</li></ul></td>
+            <td>&mdash;</td><td>Chapters 16.1, 16.2, 16.3, 17</td>
+          </tr>
+          <tr>
+            <td><strong>4. Control of Microorganisms</strong></td><td>Weeks 7–8</td>
+            <td><ul class="topic-list"><li>Physical control</li><li>Chemical control</li><li>Chemotherapeutics and antibiotics</li></ul></td>
+            <td>Term Test 2 follows this unit; covers Units 3–4</td><td>Chapters 14, 15</td>
+          </tr>
+          <tr>
+            <td><strong>5. Body Defences</strong></td><td>Week 9</td>
+            <td><ul class="topic-list"><li>First, second, and third lines of defence</li><li>Microbe-specific defence mechanisms</li><li>Immunity</li></ul></td>
+            <td>&mdash;</td><td>Chapters 18, 19</td>
+          </tr>
+          <tr>
+            <td><strong>6. Pathogenic Microorganisms</strong></td><td>Weeks 11–13</td>
+            <td><ul class="topic-list"><li>Bacterial infections</li><li>Viral infections</li></ul></td>
+            <td>Final exam follows this unit; covers Units 1–6</td><td>Chapters 22.1–4, 23.3, 24.2, 25.2, 26.2 (pp. 1790–1795), 26.3 (pp. 1829–1835)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="evaluation-wrap">
+      <h3 class="evaluation-heading">Student Evaluations</h3>
+      <div class="schedule-table-wrap">
+        <table class="evaluation-table">
+          <thead><tr><th>Assessment</th><th>Scheduled</th><th>Weight</th></tr></thead>
+          <tbody>
+            <tr><td>Quizzes</td><td>Weeks 4–14</td><td>8%</td></tr>
+            <tr class="test-row"><td>Term Test 1</td><td>Week 6</td><td>28%</td></tr>
+            <tr class="test-row"><td>Term Test 2</td><td>Week 10</td><td>28%</td></tr>
+            <tr><td>Final Exam</td><td>Week 14</td><td>36%</td></tr>
+            <tr class="total-row"><td colspan="2">Total</td><td>100%</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</main>
+<footer>MICR1500 Study Portal &bull; Hosted on GitHub Pages</footer>
+</body>
+</html>
